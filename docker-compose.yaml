@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  agent-benchmark:
+    build: .
+    volumes:
+      - .:/app
+      - ./data:/app/data
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - EMBEDDING_PROVIDER=openrouter
+      - OPENROUTER_EMBEDDING_MODEL=${OPENROUTER_EMBEDDING_MODEL}
+      - ENRICHMENT_MODEL=${ENRICHMENT_MODEL}
+      - CHROMA_PERSIST_DIR=/tmp/chroma_db
+    command: python tests/performance/run_benchmark.py
