@@ -1,0 +1,55 @@
+# Configuração do git-cliff para geração de changelog
+# https://git-cliff.org
+
+[changelog]
+header = """
+# Changelog
+
+Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+
+"""
+body = """
+{% if version %}\
+    ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+    ## [Não lançado]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+    ### {{ group | striptags | trim | upper_first }}
+    {% for commit in commits %}
+        - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
+            {% if commit.breaking %}[**BREAKING**] {% endif %}\
+            {{ commit.message | upper_first }}\
+    {% endfor %}
+{% endfor %}\n
+"""
+footer = """
+---
+*Gerado automaticamente por [git-cliff](https://github.com/orhun/git-cliff)*
+"""
+trim = true
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+split_commits = false
+
+commit_parsers = [
+    { message = "^feat", group = "🚀 Funcionalidades" },
+    { message = "^fix", group = "🐛 Correções" },
+    { message = "^doc", group = "📚 Documentação" },
+    { message = "^perf", group = "⚡ Performance" },
+    { message = "^refactor", group = "♻️ Refatoração" },
+    { message = "^style", group = "🎨 Estilo" },
+    { message = "^test", group = "🧪 Testes" },
+    { message = "^chore\\(release\\)", skip = true },
+    { message = "^chore", group = "🔧 Manutenção" },
+    { body = ".*security", group = "🔒 Segurança" },
+]
+
+filter_commits = false
+tag_pattern = "v[0-9].*"
+skip_tags = ""
+ignore_tags = ""
+topo_order = false
+sort_commits = "oldest"
